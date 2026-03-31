@@ -270,47 +270,104 @@ def buat_kunci_jawaban_word(soal_data):
         row[1].text = str(jawaban)
     return doc
 
-# ========== HALAMAN LOGIN ==========
+# ========== HALAMAN LOGIN (DIPERBAIKI) ==========
 def show_login_page():
-    st.title("🔐 Login - Generator Soal Multi Mapel")
+    # CSS untuk styling
+    st.markdown("""
+        <style>
+        /* Mengatur container login agar di tengah */
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        /* Mengatur judul */
+        .login-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        /* Mengatur tombol */
+        .stButton button {
+            width: 100%;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        /* Mengatur input field */
+        .stTextInput input {
+            border-radius: 8px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
     
-    tab1, tab2 = st.tabs(["Login", "Registrasi"])
+    # Container tengah
+    col1, col2, col3 = st.columns([1, 2, 1])
     
-    with tab1:
-        with st.form("login_form"):
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
-            if st.form_submit_button("Login", use_container_width=True):
-                if username and password:
-                    success, result = login_user(username, password)
-                    if success:
-                        st.session_state.logged_in = True
-                        st.session_state.user_id = result
-                        st.session_state.username = username
-                        st.session_state.mapel_list = load_mapel(result)
-                        st.success(f"Selamat datang, {username}!")
-                        st.rerun()
+    with col2:
+        st.markdown('<div class="login-container">', unsafe_allow_html=True)
+        
+        # Logo/Icon
+        st.markdown('<div class="login-title">', unsafe_allow_html=True)
+        st.markdown("# 📖 Generator Soal")
+        st.markdown("##### Multi Mapel | Multi AI")
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        tab1, tab2 = st.tabs(["🔐 Login", "📝 Registrasi"])
+        
+        with tab1:
+            with st.form("login_form", clear_on_submit=False):
+                username = st.text_input("Username", placeholder="Masukkan username Anda", key="login_username")
+                password = st.text_input("Password", type="password", placeholder="Masukkan password", key="login_password")
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                
+                submitted = st.form_submit_button("Login", use_container_width=True, type="primary")
+                
+                if submitted:
+                    if username and password:
+                        success, result = login_user(username, password)
+                        if success:
+                            st.session_state.logged_in = True
+                            st.session_state.user_id = result
+                            st.session_state.username = username
+                            st.session_state.mapel_list = load_mapel(result)
+                            st.success(f"Selamat datang, {username}!")
+                            st.rerun()
+                        else:
+                            st.error(result)
                     else:
-                        st.error(result)
-                else:
-                    st.error("Masukkan username dan password!")
-    
-    with tab2:
-        with st.form("register_form"):
-            new_username = st.text_input("Username Baru")
-            new_password = st.text_input("Password Baru", type="password")
-            confirm_password = st.text_input("Konfirmasi Password", type="password")
-            if st.form_submit_button("Registrasi", use_container_width=True):
-                if not new_username or not new_password:
-                    st.error("Username dan password harus diisi!")
-                elif new_password != confirm_password:
-                    st.error("Password tidak sama!")
-                else:
-                    success, msg = register_user(new_username, new_password)
-                    if success:
-                        st.success(msg)
+                        st.error("Masukkan username dan password!")
+        
+        with tab2:
+            with st.form("register_form", clear_on_submit=False):
+                new_username = st.text_input("Username Baru", placeholder="Pilih username", key="reg_username")
+                new_password = st.text_input("Password Baru", type="password", placeholder="Pilih password", key="reg_password")
+                confirm_password = st.text_input("Konfirmasi Password", type="password", placeholder="Ulangi password", key="reg_confirm")
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                
+                submitted = st.form_submit_button("Registrasi", use_container_width=True)
+                
+                if submitted:
+                    if not new_username or not new_password:
+                        st.error("Username dan password harus diisi!")
+                    elif new_password != confirm_password:
+                        st.error("Password dan konfirmasi tidak sama!")
                     else:
-                        st.error(msg)
+                        success, msg = register_user(new_username, new_password)
+                        if success:
+                            st.success(msg)
+                        else:
+                            st.error(msg)
+        
+        # Footer
+        st.markdown("---")
+        st.caption("✨ Ditenagai Gemini | DeepSeek | OpenAI | Maia Router")
+        st.caption("🔒 Data Anda aman dan tersimpan di database")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ========== DASHBOARD MAPEL ==========
 def show_dashboard():
